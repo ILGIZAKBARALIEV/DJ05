@@ -1,11 +1,12 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from movie_app.models import MovieModel, DirectorModel
+from movie_app.models import MovieModel, DirectorModel, ReviewModel
 from .serializers import (DirectorModelSerializer,
                           DirectorModelDetailSerializer,
                           MovieModelSerializer,
                           ReviewModelSerializer,
+                          ReviewModelDetailSerializer,
                           MovieDetailSerializer)
 
 @api_view(http_method_names=['GET'])
@@ -40,6 +41,24 @@ def movies_detail_api_view(request,id):
         return Response(data={'error':'Movie not found'},
                         status=status.HTTP_404_NOT_FOUND)
     data = MovieDetailSerializer(movie).data
+    return Response(data=data)
+
+
+@api_view(['GET'])
+def reviews_list_api_view(request):
+    reviews = ReviewModel.objects.all()
+    serializer = ReviewModelSerializer(reviews, many=True)
+    return Response(data=serializer.data)
+
+
+@api_view(['GET'])
+def reviews_detail_api_view(request,id):
+    try:
+        review = ReviewModel.objects.get(id=id)
+    except ReviewModel.DoesNotExist:
+        return Response(data={'error':'Review not found'},
+                        status=status.HTTP_404_NOT_FOUND)
+    data = ReviewModelDetailSerializer(review).data
     return Response(data=data)
 
 
