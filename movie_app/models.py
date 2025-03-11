@@ -2,7 +2,7 @@ from django.db import models
 
 class DirectorModel(models.Model):
     name = models.CharField(max_length=100)
-
+    movies_count = models.IntegerField(default=5)
 
     def __str__(self):
         return self.name
@@ -12,10 +12,15 @@ class DirectorModel(models.Model):
         verbose_name_plural = 'Directors'
 
 
-class MovieModel(models.Model):
+
+
+class MoviesModel(models.Model):
     title = models.CharField(max_length=100)
+    movies_count = models.IntegerField(default=5, null=True , blank=True )
     description = models.TextField()
-    duration = models.IntegerField()
+    reviews_count = models.IntegerField(default=5)
+    duration = models.IntegerField(null=True , blank=True)
+    rating = models.FloatField(null=True , blank=True)
     director = models.ForeignKey(DirectorModel, on_delete=models.CASCADE)
 
 
@@ -26,13 +31,16 @@ class MovieModel(models.Model):
         verbose_name = 'Movie'
         verbose_name_plural = 'Movies'
 
-
+STARS = (
+    (star,'*'*star) for star in range(1,6)
+)
 
 
 class ReviewModel(models.Model):
+    reviews = models.TextField(null=True , blank=True)
     text = models.TextField()
-    movie = models.ForeignKey(MovieModel, on_delete=models.CASCADE)
-
+    stars = models.IntegerField(choices=STARS, default=5, null=True , blank=True)
+    movies = models.ForeignKey(MoviesModel, on_delete=models.CASCADE)
     def __str__(self):
         return self.text
 

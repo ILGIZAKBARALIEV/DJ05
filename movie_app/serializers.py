@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from .models import DirectorModel
-from .models import MovieModel
+from .models import MoviesModel
 from .models import ReviewModel
 
 class DirectorModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = DirectorModel
-        fields= 'name'.split()
+        fields= 'name id '.split()
 
 class DirectorModelDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,14 +14,14 @@ class DirectorModelDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class MovieModelSerializer(serializers.ModelSerializer):
+class MoviesModelSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MovieModel
+        model = MoviesModel
         fields = ['title', 'description', 'duration']
 
-class MovieDetailSerializer(serializers.ModelSerializer):
+class MoviesDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MovieModel
+        model = MoviesModel
         fields = '__all__'
 
 class ReviewModelSerializer(serializers.ModelSerializer):
