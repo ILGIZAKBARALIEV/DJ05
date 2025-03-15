@@ -23,7 +23,7 @@ urlpatterns = [
     path('api/v1/DirectorModel/',views.director_lis_create_view),
     path('api/v1/DirectorModel/<int:id>/',views.director_detail_api_view),
     path('api/v1/MoviesModel/',views.movies_list_create_api_view),
-    path('api/v1/MoviesMode/<int:id>/',views.movies_detail_api_view),
+    path('api/v1/MoviesModel/<int:id>/',views.movies_detail_api_view),
     path('api/v1/ReviewModel/',views.reviews_list_create_api_view),
     path('api/v1/ReviewModel/<int:id>/',views.reviews_detail_api_view)
 ]
