@@ -56,10 +56,10 @@ def movies_list_create_api_view(request):
         with transaction.atomic():
             title =request.data.get('title')
             description =request.data.get('description')
-            director =DirectorModel.objects.get(id=request.data.get('director'))
+            director = request.data.get('director')
             movies =MoviesModel.objects.create(title=title,description=description,director=director)
             movies.save()
-            return Response(data = MoviesModelSerializer(movies).data,
+            return Response(data=MoviesModelSerializer(movies).data,
                             status=status.HTTP_201_CREATED)
 
 @api_view(['GET','PUT','DELETE'])
@@ -79,49 +79,50 @@ def movies_detail_api_view(request,id):
         with transaction.atomic():
             movie.title =request.data.get('title')
             movie.description =request.data.get('description')
-            movie.director =DirectorModel.objects.get(id=request.data.get('director'))
+            movie.director =request.data.get('director')
             movie.save()
             return Response(data=MoviesModelSerializer(movie).data,
                             status=status.HTTP_201_CREATED)
 
 
 
-@api_view(['GET','POST'])
+@api_view(['GET', 'POST'])
 def reviews_list_create_api_view(request):
     if request.method == 'GET':
         reviews = ReviewModel.objects.all()
         serializer = ReviewModelSerializer(reviews, many=True)
         return Response(data=serializer.data)
+
     elif request.method == 'POST':
         with transaction.atomic():
-            review = ReviewModel.objects.create(review=request.data.get('review'))
-            review.review=request.data.get('review')
-            review.save()
-            return Response(data=ReviewModelSerializer(review).data,
-                            status=status.HTTP_201_CREATED)
+            serializer = ReviewModelSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
-@api_view(['GET','PUT','DELETE'])
-def reviews_detail_api_view(request,id):
+@api_view(['GET', 'PUT', 'DELETE'])
+def reviews_detail_api_view(request, id):
     try:
         review = ReviewModel.objects.get(id=id)
     except ReviewModel.DoesNotExist:
-        return Response(data={'error':'Review not found'},
-                        status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Review not found'}, status=status.HTTP_404_NOT_FOUND)
+
     if request.method == 'GET':
-        data = ReviewModelSerializer(review).data
-        return Response(data=data)
+        serializer = ReviewModelSerializer(review)
+        return Response(data=serializer.data)
+
     elif request.method == 'DELETE':
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
     elif request.method == 'PUT':
         with transaction.atomic():
-            review.review = request.data.get('review')
-            review.save()
-            return Response(data=ReviewModelSerializer(review).data,
-                            status=status.HTTP_201_CREATED)
+            serializer = ReviewModelSerializer(review, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
