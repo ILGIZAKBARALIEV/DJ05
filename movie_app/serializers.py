@@ -3,6 +3,7 @@ from .models import DirectorModel
 from .models import MoviesModel
 from .models import ReviewModel
 
+
 class DirectorModelSerializer(serializers.ModelSerializer):
     movies_count = serializers.SerializerMethodField()
     class Meta:
@@ -16,7 +17,6 @@ class DirectorModelDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DirectorModel
         fields = '__all__'
-
 
 class MoviesModelSerializer(serializers.ModelSerializer):
     average_rating = serializers.SerializerMethodField()

@@ -1,7 +1,7 @@
 from django.db import models
 
 class DirectorModel(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,null=True,blank=True)
 
     def __str__(self):
         return self.name
@@ -13,6 +13,7 @@ class DirectorModel(models.Model):
 
 
 
+
 class MoviesModel(models.Model):
     title = models.CharField(max_length=100)
     movies_count = models.IntegerField(default=5, null=True , blank=True )
@@ -20,7 +21,7 @@ class MoviesModel(models.Model):
     reviews_count = models.IntegerField(default=5)
     duration = models.IntegerField(null=True , blank=True)
     rating = models.FloatField(null=True , blank=True)
-    director = models.ForeignKey(DirectorModel, on_delete=models.CASCADE,related_name='movies')
+    director = models.ForeignKey(DirectorModel, on_delete=models.CASCADE,related_name='movies',null=True,blank=True)
 
 
     def __str__(self):
