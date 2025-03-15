@@ -12,12 +12,6 @@ class DirectorModelSerializer(serializers.ModelSerializer):
     def get_movies_count(self, director):
         return director.movies.count()
 
-
-class DirectorModelDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DirectorModel
-        fields = '__all__'
-
 class MoviesModelSerializer(serializers.ModelSerializer):
     average_rating = serializers.SerializerMethodField()
     class Meta:
@@ -32,18 +26,8 @@ class MoviesModelSerializer(serializers.ModelSerializer):
             return average
         return None
 
-class MoviesDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MoviesModel
-        fields = '__all__'
-
 class ReviewModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReviewModel
         fields = '__all__'
 
-
-class ReviewModelDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReviewModel
-        fields = '__all__'

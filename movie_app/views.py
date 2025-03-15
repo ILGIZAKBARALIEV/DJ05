@@ -4,11 +4,8 @@ from rest_framework.response import Response
 from movie_app.models import MoviesModel, DirectorModel, ReviewModel
 from  django.db import transaction
 from .serializers import (DirectorModelSerializer,
-                          DirectorModelDetailSerializer,
                           MoviesModelSerializer,
-                          ReviewModelSerializer,
-                          ReviewModelDetailSerializer,
-                          MoviesDetailSerializer,)
+                          ReviewModelSerializer)
 
 @api_view(http_method_names=['GET','POST'])
 def director_lis_create_view(request):
@@ -19,13 +16,13 @@ def director_lis_create_view(request):
 
     elif request.method == 'POST':
         with transaction.atomic():
+
             name =request.data.get('name')
 
             print(name)
             directors =DirectorModel.objects.create(name=name)
-            directors.name=name
-            directors.save()
-            return Response(data=directors.name)
+            return Response(data=DirectorModelSerializer(directors).data,
+                            status=status.HTTP_201_CREATED)
 
 @api_view(['GET','PUT','DELETE'])
 def director_detail_api_view(request, id):
@@ -35,17 +32,16 @@ def director_detail_api_view(request, id):
         return Response(data={'error': 'Director not found'},
                         status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        data =DirectorModelDetailSerializer(director).data
+        data =DirectorModelSerializer(director).data
         return Response(data=data)
     elif request.method == 'DELETE':
         director.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     elif request.method == 'PUT':
         with transaction.atomic():
-            name =request.data.get('name')
-            director =DirectorModel.objects.get(id=id)
+            director.name =request.data.get('name')
             director.save()
-            return Response(data= DirectorModelDetailSerializer(director).data,
+            return Response(data=DirectorModelSerializer(director).data,
                             status=status.HTTP_201_CREATED)
 
 
@@ -56,14 +52,14 @@ def movies_list_create_api_view(request):
         movies = MoviesModel.objects.all()
         serializer = MoviesModelSerializer(movies, many=True)
         return Response(data=serializer.data)
-    elif request.method == "POST":
+    elif request.method == 'POST':
         with transaction.atomic():
             title =request.data.get('title')
             description =request.data.get('description')
             director =DirectorModel.objects.get(id=request.data.get('director'))
             movies =MoviesModel.objects.create(title=title,description=description,director=director)
             movies.save()
-            return Response(data = MoviesDetailSerializer(movies).data,
+            return Response(data = MoviesModelSerializer(movies).data,
                             status=status.HTTP_201_CREATED)
 
 @api_view(['GET','PUT','DELETE'])
@@ -74,7 +70,7 @@ def movies_detail_api_view(request,id):
         return Response(data={'error':'Movie not found'},
                         status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        data = MoviesDetailSerializer(movie).data
+        data =MoviesModelSerializer(movie).data
         return Response(data=data)
     elif request.method == 'DELETE':
         movie.delete()
@@ -85,7 +81,7 @@ def movies_detail_api_view(request,id):
             movie.description =request.data.get('description')
             movie.director =DirectorModel.objects.get(id=request.data.get('director'))
             movie.save()
-            return Response(data= MoviesDetailSerializer(movie).data,
+            return Response(data=MoviesModelSerializer(movie).data,
                             status=status.HTTP_201_CREATED)
 
 
@@ -98,10 +94,10 @@ def reviews_list_create_api_view(request):
         return Response(data=serializer.data)
     elif request.method == 'POST':
         with transaction.atomic():
-            reviews =ReviewModel.objects.create(review=request.data.get('review'))
-            reviews.review=request.data.get('review')
-            reviews.save()
-            return Response(data=ReviewModelDetailSerializer(reviews).data,
+            review = ReviewModel.objects.create(review=request.data.get('review'))
+            review.review=request.data.get('review')
+            review.save()
+            return Response(data=ReviewModelSerializer(review).data,
                             status=status.HTTP_201_CREATED)
 
 
@@ -115,7 +111,7 @@ def reviews_detail_api_view(request,id):
         return Response(data={'error':'Review not found'},
                         status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        data = ReviewModelDetailSerializer(review).data
+        data = ReviewModelSerializer(review).data
         return Response(data=data)
     elif request.method == 'DELETE':
         review.delete()
@@ -124,7 +120,7 @@ def reviews_detail_api_view(request,id):
         with transaction.atomic():
             review.review = request.data.get('review')
             review.save()
-            return Response(data= ReviewModelDetailSerializer(review).data,
+            return Response(data=ReviewModelSerializer(review).data,
                             status=status.HTTP_201_CREATED)
 
 
