@@ -55,21 +55,21 @@ class MoviesValidateSerializer(serializers.Serializer):
         try:
                 MoviesModel.objects.get(title=title)
         except MoviesModel.DoesNotExist:
-            raise ValidationError('Title does not exist')
+            raise ValidationError('title does not exist')
         return title
 
 
 class ReviewValidateSerializer(serializers.Serializer):
     text = serializers.CharField()
     stars = serializers.IntegerField()
-    movie = serializers.IntegerField()
+    movies = serializers.IntegerField()
 
 
     def validate_text(self, text):
         try:
             ReviewModel.objects.get(text=text)
         except ReviewModel.DoesNotExist:
-            raise ValidationError('Text does not exist')
+            raise ValidationError('text does not exist')
         return text
 
 

@@ -56,23 +56,23 @@ def director_detail_api_view(request, id):
 
 @api_view(['GET','POST'])
 def movies_list_create_api_view(request):
-    serializer = MoviesValidateSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(status=status.HTTP_400_BAD_REQUEST,
-                        data=serializer.errors)
-    if request.method == 'GET':
+    if  request.method == 'GET':
         movies = MoviesModel.objects.all()
         serializer = MoviesModelSerializer(movies, many=True)
         return Response(data=serializer.data)
     elif request.method == 'POST':
+        serializer = MoviesValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+        title = serializer.data.get('title')
+        description = serializer.data.get('description')
+        directors = serializer.data.get('directors')
         with transaction.atomic():
-            title = serializer.data.get('title')
-            description =serializer.data.get('description')
-            director = serializer.data.get('director')
-            movies =MoviesModel.objects.create(title=title,description=description,director=director)
-            movies.save()
+            movies =MoviesModel.objects.create(title=title, description=description, directors=directors)
             return Response(data=MoviesModelSerializer(movies).data,
                             status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET','PUT','DELETE'])
 def movies_detail_api_view(request,id):
