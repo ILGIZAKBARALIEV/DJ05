@@ -67,9 +67,8 @@ def movies_list_create_api_view(request):
                             data=serializer.errors)
         title = serializer.data.get('title')
         description = serializer.data.get('description')
-        directors = serializer.data.get('directors')
         with transaction.atomic():
-            movies =MoviesModel.objects.create(title=title, description=description, directors=directors)
+            movies =MoviesModel.objects.create(title=title, description=description, )
             return Response(data=MoviesModelSerializer(movies).data,
                             status=status.HTTP_201_CREATED)
 
