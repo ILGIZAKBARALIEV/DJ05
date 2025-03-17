@@ -5,7 +5,10 @@ from movie_app.models import MoviesModel, DirectorModel, ReviewModel
 from  django.db import transaction
 from .serializers import (DirectorModelSerializer,
                           MoviesModelSerializer,
-                          ReviewModelSerializer)
+                          ReviewModelSerializer,
+                          DirectorsValidateSerializer,
+                          MoviesValidateSerializer,
+                          ReviewValidateSerializer)
 
 @api_view(http_method_names=['GET','POST'])
 def director_lis_create_view(request):
@@ -15,11 +18,16 @@ def director_lis_create_view(request):
         return Response(data=serializer.data)
 
     elif request.method == 'POST':
+        serializer = DirectorsValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
+        name = serializer.data.get('name')
+
         with transaction.atomic():
 
             name =request.data.get('name')
 
-            print(name)
             directors =DirectorModel.objects.create(name=name)
             return Response(data=DirectorModelSerializer(directors).data,
                             status=status.HTTP_201_CREATED)
@@ -48,15 +56,19 @@ def director_detail_api_view(request, id):
 
 @api_view(['GET','POST'])
 def movies_list_create_api_view(request):
+    serializer = MoviesValidateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        data=serializer.errors)
     if request.method == 'GET':
         movies = MoviesModel.objects.all()
         serializer = MoviesModelSerializer(movies, many=True)
         return Response(data=serializer.data)
     elif request.method == 'POST':
         with transaction.atomic():
-            title =request.data.get('title')
-            description =request.data.get('description')
-            director = request.data.get('director')
+            title = serializer.data.get('title')
+            description =serializer.data.get('description')
+            director = serializer.data.get('director')
             movies =MoviesModel.objects.create(title=title,description=description,director=director)
             movies.save()
             return Response(data=MoviesModelSerializer(movies).data,
@@ -94,12 +106,18 @@ def reviews_list_create_api_view(request):
         return Response(data=serializer.data)
 
     elif request.method == 'POST':
+        serializer = ReviewValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                            data=serializer.errors)
         with transaction.atomic():
-            serializer = ReviewModelSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            text = serializer.data.get('text')
+            stars = serializer.data.get('stars')
+            movie = serializer.data.get('movies')
+            movies = MoviesModel.objects.create(text=text,stars=stars,movie=movie)
+            movies.save()
+            return Response(data=MoviesModelSerializer(movies).data,
+                            status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def reviews_detail_api_view(request, id):
@@ -115,7 +133,6 @@ def reviews_detail_api_view(request, id):
     elif request.method == 'DELETE':
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
     elif request.method == 'PUT':
         with transaction.atomic():
             serializer = ReviewModelSerializer(review, data=request.data, partial=True)
@@ -123,7 +140,6 @@ def reviews_detail_api_view(request, id):
                 serializer.save()
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 

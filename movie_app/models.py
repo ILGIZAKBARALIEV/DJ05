@@ -40,7 +40,7 @@ STARS = (
 class ReviewModel(models.Model):
     text = models.TextField()
     stars = models.IntegerField(choices=STARS, default=5, null=True , blank=True)
-    movies = models.ForeignKey(MoviesModel, on_delete=models.CASCADE,related_name='reviews')
+    movie = models.ForeignKey(MoviesModel, on_delete=models.CASCADE,related_name='reviews')
     def __str__(self):
         return self.text
 
