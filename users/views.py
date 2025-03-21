@@ -30,11 +30,10 @@ def registration_api_view(request):
     ConfirmationCode.objects.create(user=user,code=code)
 
     send_mail(
-        "Код подтверждения",
-        f"Ваш код подтверждения: {code}",
-        "okoo.goe@gmail.com",
-        [user.email],
-        fail_silently=False,
+        'Your code',
+        message=code,
+        from_email='<EMAIL>',
+        recipient_list=[user.email]
     )
     return Response({"message": "Код отправлен на email"},status=status.HTTP_200_OK)
 
@@ -58,18 +57,18 @@ def authorization_api_view(request):
 def confirmation_api_view(request):
     serializer = UserConfirmationCodeSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.validated_data.get('user')
+        username = serializer.validated_data.get('user')
         password = serializer.validated_data.get('password')
         email = serializer.validated_data.get('email')
         code = serializer.validated_data.get('code')
         try:
-            user = User.objects.get(user=user,password=password,email=email)
-            confirmation = ConfirmationCode.objects.get(user=user, code=code)
+            username = User.objects.get(username=username, email=email)
+            confirmation = ConfirmationCode.objects.get(user=username,password=password, code=code)
         except (User.DoesNotExist, ConfirmationCode.DoesNotExist):
             return Response({"error": "Неверный email или код"},status= status.HTTP_400_BAD_REQUEST)
 
-        user.is_active=True
-        user.save()
+        username.is_active=True
+        username.save()
         confirmation.delete()
 
         return Response({"message": "Пользователь успешно подтвержден"},status= status.HTTP_200_OK)

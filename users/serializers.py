@@ -7,7 +7,7 @@ from .models import ConfirmationCode
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields =["id","username","password","email","code","is_active"]
+        fields =["id","username","password","email","is_active"]
 
 class UserBaseSerializer(serializers.Serializer):
     username = serializers.CharField(min_length=2, max_length=100)
