@@ -1,23 +1,38 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from . import models
 from rest_framework.exceptions import ValidationError
 
 
-class UserBaseSerializer(serializers.Serializer):
-    username = serializers.CharField(min_length=2, max_length=100)
-    password = serializers.CharField(min_length=6, max_length=100)
+class UserConfirmation(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
 
-class UserAuthSerializer(UserBaseSerializer):
-    pass
+class UserAuthSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=6)
+    password = serializers.CharField(max_length=6)
 
-class UserRegistrationSerializer(UserBaseSerializer):
-    pass
 
-    def validate_username(self,username):
-        try:
-            User.objects.get(username=username)
-        except:
-            return username
-        raise ValidationError('Username already exists')
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'username': {'required': True},
+            'email': {'required': True},
+        }
+
+    def validate_username(self, value):
+        # Проверка, что username не занят
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already in use")
+        return value
+
+    def validate_email(self, value):
+        # Проверка, что email не занят
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already in use")
+        return value
 
 
