@@ -1,14 +1,39 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from movie_app.models import MoviesModel, DirectorModel, ReviewModel
 from  django.db import transaction
+from collections import OrderedDict
 from .serializers import (DirectorModelSerializer,
                           MoviesModelSerializer,
                           ReviewModelSerializer,
                           DirectorsValidateSerializer,
                           MoviesValidateSerializer,
                           ReviewValidateSerializer)
+
+
+class CustomPagination(PageNumberPagination):
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('total', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data)
+        ]))
+
+
+class DirectorListAPIView(ListCreateAPIView):
+    queryset = DirectorModel.objects.all()
+    serializer_class = DirectorModelSerializer
+    pagination_class = CustomPagination
+
+class DirectorDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = DirectorModel.objects.all()
+    serializer_class = DirectorModelSerializer
+    lookup_field = 'id'
+
 
 @api_view(http_method_names=['GET','POST'])
 def director_lis_create_view(request):
@@ -53,6 +78,17 @@ def director_detail_api_view(request, id):
                             status=status.HTTP_201_CREATED)
 
 
+class MoviesListAPIView(ListCreateAPIView):
+    queryset = MoviesModel.objects.all()
+    serializer_class = MoviesModelSerializer
+    pagination_class = CustomPagination
+
+
+class MoviesDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = MoviesModel.objects.all()
+    serializer_class = MoviesModelSerializer
+    lookup_field = 'id'
+
 
 @api_view(['GET','POST'])
 def movies_list_create_api_view(request):
@@ -95,6 +131,10 @@ def movies_detail_api_view(request,id):
             return Response(data=MoviesModelSerializer(movie).data,
                             status=status.HTTP_201_CREATED)
 
+class ReviewsListAPIView(ListCreateAPIView):
+    queryset = ReviewModel.objects.all()
+    serializer_class = ReviewModelSerializer
+    pagination_class = CustomPagination
 
 
 @api_view(['GET', 'POST'])
@@ -117,6 +157,13 @@ def reviews_list_create_api_view(request):
             movies.save()
             return Response(data=MoviesModelSerializer(movies).data,
                             status=status.HTTP_201_CREATED)
+
+
+class ReviewsDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = ReviewModel.objects.all()
+    serializer_class = ReviewModelSerializer
+    lookup_field = 'id'
+
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def reviews_detail_api_view(request, id):

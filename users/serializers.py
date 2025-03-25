@@ -9,8 +9,8 @@ class UserConfirmation(serializers.Serializer):
     code = serializers.CharField(max_length=6)
 
 class UserAuthSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=6)
-    password = serializers.CharField(max_length=6)
+    username = serializers.CharField(min_length=3, max_length=30)
+    password = serializers.CharField(min_length=3, max_length=6)
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

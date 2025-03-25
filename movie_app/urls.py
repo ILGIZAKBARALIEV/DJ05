@@ -1,12 +1,13 @@
-from django.urls import path
+from django.urls import path, include
 from movie_app import views
+from utils.constants import LIST_CREATE,RETRIEVE_UPDATE_DESTROY
 
 
 urlpatterns = [
-    path('',views.director_lis_create_view),
-    path('<int:id>/',views.director_detail_api_view),
-    path('',views.movies_list_create_api_view),
-    path('<int:id>/',views.movies_detail_api_view),
-    path('',views.reviews_list_create_api_view),
-    path('<int:id>/',views.reviews_detail_api_view),
+    path('DirectorModel/',views.DirectorListAPIView.as_view()),
+    path('<int:id>/',views.DirectorDetailAPIView.as_view()),
+    path('MoviesModel/',views.MoviesListAPIView.as_view()),
+    path('<int:id>/',views.MoviesDetailAPIView.as_view()),
+    path('ReviewModel/',views.ReviewsListAPIView.as_view()),
+    path('<int:id>/',views.ReviewsDetailAPIView.as_view()),
 ]

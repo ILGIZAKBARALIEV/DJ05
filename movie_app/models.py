@@ -11,10 +11,6 @@ class DirectorModel(models.Model):
         verbose_name = 'Director'
         verbose_name_plural = 'Directors'
 
-
-
-
-
 class MoviesModel(models.Model):
     title = models.CharField(max_length=100)
     movies_count = models.IntegerField(default=5, null=True , blank=True )
